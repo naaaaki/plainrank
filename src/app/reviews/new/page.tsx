@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 function StarInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   const [hovered, setHovered] = useState(0);
@@ -43,13 +44,75 @@ function StarInput({ label, value, onChange }: { label: string; value: number; o
   );
 }
 
-export default function NewReviewPage() {
-  const [scores, setScores] = useState({ overall: 0, usability: 0, value: 0, support: 0 });
-  const [submitted, setSubmitted] = useState(false);
+/**
+ * Inner form component that reads URL search params.
+ * Must be wrapped in a Suspense boundary because useSearchParams()
+ * opts out of static rendering in Next.js App Router.
+ */
+function NewReviewForm() {
+  const searchParams = useSearchParams();
+  // serviceId is provided via URL query parameter: /reviews/new?serviceId=xxx
+  const serviceId = searchParams.get("serviceId") ?? "";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [scores, setScores] = useState({ overall: 0, usability: 0, value: 0, support: 0 });
+  const [body, setBody] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setErrorMessage(null);
+
+    // Client-side guard: all scores must be selected
+    if (scores.overall === 0 || scores.usability === 0 || scores.value === 0 || scores.support === 0) {
+      setErrorMessage("すべての評価項目を選択してください");
+      return;
+    }
+
+    if (!serviceId) {
+      setErrorMessage("サービスが指定されていません。URLに ?serviceId=xxx を追加してください");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serviceId,
+          overall: scores.overall,
+          usability: scores.usability,
+          value: scores.value,
+          support: scores.support,
+          body,
+        }),
+      });
+
+      if (res.status === 401) {
+        setErrorMessage("レビューを投稿するにはログインが必要です");
+        return;
+      }
+
+      if (res.status === 409) {
+        setErrorMessage("このサービスにはすでにレビューを投稿済みです");
+        return;
+      }
+
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        setErrorMessage(data.error ?? "投稿に失敗しました。もう一度お試しください");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setErrorMessage("通信エラーが発生しました。もう一度お試しください");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -258,6 +321,11 @@ export default function NewReviewPage() {
                 rows={5}
                 placeholder="実際に使ってみた感想を書いてください。良い点・悪い点など具体的に書くと他のユーザーの参考になります。"
                 style={{ ...inputStyle, resize: 'none' }}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+                minLength={10}
+                maxLength={2000}
               />
             </div>
 
@@ -281,10 +349,25 @@ export default function NewReviewPage() {
               </div>
             </div>
 
+            {/* エラーメッセージ */}
+            {errorMessage && (
+              <div style={{
+                padding: '10px 14px',
+                background: 'rgba(220,38,38,.06)',
+                border: '1px solid rgba(220,38,38,.25)',
+                borderRadius: '8px',
+                fontSize: '.82rem',
+                color: '#dc2626',
+              }}>
+                {errorMessage}
+              </div>
+            )}
+
             {/* 送信ボタン */}
             <button
               type="submit"
               className="pr-btn-primary"
+              disabled={isSubmitting}
               style={{
                 width: '100%',
                 padding: '11px',
@@ -292,9 +375,11 @@ export default function NewReviewPage() {
                 fontSize: '.875rem',
                 fontWeight: 600,
                 justifyContent: 'center',
+                opacity: isSubmitting ? 0.6 : 1,
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
               }}
             >
-              レビューを投稿する
+              {isSubmitting ? "投稿中..." : "レビューを投稿する"}
             </button>
 
             <p style={{ fontSize: '.75rem', textAlign: 'center', color: 'var(--pr-text-ter)' }}>
@@ -361,5 +446,17 @@ export default function NewReviewPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+/**
+ * Page entry point — wraps the form in a Suspense boundary so that
+ * useSearchParams() inside NewReviewForm does not break static rendering.
+ */
+export default function NewReviewPage() {
+  return (
+    <Suspense>
+      <NewReviewForm />
+    </Suspense>
   );
 }
