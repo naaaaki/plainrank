@@ -1164,4 +1164,20 @@
 .av-canva    { background: #00c4cc; }
 .av-hubspot  { background: #ff7a59; }
 .av-notion   { background: #1e293b; }
-.av-slack    { background: #4a154b; }
+.av-slack      { background: #4a154b; }
+.av-supabase   { background: #3ecf8e; }
+.av-mailchimp  { background: #ffe01b; }
+.av-ahrefs     { background: #ff6d00; }
+.av-todoist    { background: #db4035; }
+.av-zapier     { background: #ff4a00; }
+.av-1password  { background: #1a8cff; }
+.av-cloudflare { background: #f38020; }
+.av-snyk       { background: #4c4a73; }
+
+/* パンくずリンク */
+.pr-breadcrumb-link {
+  color: var(--pr-text-ter);
+  text-decoration: none;
+  transition: color .15s;
+}
+.pr-breadcrumb-link:hover { color: var(--pr-accent); }

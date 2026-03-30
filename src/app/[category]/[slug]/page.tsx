@@ -133,15 +133,11 @@ export default async function ServiceDetailPage({ params }: Props) {
             alignItems: 'center',
             gap: '6px',
           }}>
-            <Link href="/" style={{ color: 'var(--pr-text-ter)', textDecoration: 'none', transition: 'color .15s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--pr-accent)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--pr-text-ter)')}>
+            <Link href="/" className="pr-breadcrumb-link">
               ホーム
             </Link>
             <span>›</span>
-            <Link href={`/${category}`} style={{ color: 'var(--pr-text-ter)', textDecoration: 'none', transition: 'color .15s' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--pr-accent)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--pr-text-ter)')}>
+            <Link href={`/${category}`} className="pr-breadcrumb-link">
               {catMeta.name}
             </Link>
             <span>›</span>
