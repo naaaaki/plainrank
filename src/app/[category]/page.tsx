@@ -1,77 +1,11 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
 
 interface Props {
   params: Promise<{ category: string }>;
 }
-
-const MOCK_CATEGORIES: Record<string, {
-  name: string;
-  description: string;
-  reviewTotal: string;
-  badgeClass: string;
-  badgeLabel: string;
-  services: {
-    name: string;
-    slug: string;
-    score: number;
-    reviewCount: number;
-    description: string;
-    abbr: string;
-    avatarClass: string;
-  }[];
-}> = {
-  "ai-tools": {
-    name: "AIツール",
-    description: "ChatGPT・Claude・Geminiなど、生成AIアシスタントから特化型ツールまで",
-    reviewTotal: "7,823",
-    badgeClass: "ai",
-    badgeLabel: "✦ AIツール",
-    services: [
-      { name: "ChatGPT", slug: "chatgpt", score: 4.8, reviewCount: 2341, description: "OpenAIが提供する汎用AIアシスタント", abbr: "GP", avatarClass: "av-chatgpt" },
-      { name: "Claude",  slug: "claude",  score: 4.7, reviewCount: 1823, description: "Anthropicが開発するAIアシスタント",   abbr: "CL", avatarClass: "av-claude" },
-      { name: "Cursor",  slug: "cursor",  score: 4.6, reviewCount:  956, description: "AIコードエディタ・開発者向け",         abbr: "CU", avatarClass: "av-cursor" },
-      { name: "Gemini",  slug: "gemini",  score: 4.4, reviewCount:  620, description: "Googleが開発するAIアシスタント",       abbr: "GM", avatarClass: "av-gemini" },
-    ],
-  },
-  "dev-tools": {
-    name: "開発ツール",
-    description: "エンジニア・開発チーム向けのプロジェクト管理・コラボレーションツール",
-    reviewTotal: "4,210",
-    badgeClass: "dev",
-    badgeLabel: "⚙ 開発ツール",
-    services: [
-      { name: "GitHub Copilot", slug: "copilot", score: 4.5, reviewCount: 1204, description: "AIペアプログラマー・VS Code連携",     abbr: "CO", avatarClass: "av-copilot" },
-      { name: "Vercel",         slug: "vercel",  score: 4.4, reviewCount:  782, description: "フロントエンドホスティング",           abbr: "VE", avatarClass: "av-vercel" },
-      { name: "Linear",         slug: "linear",  score: 4.3, reviewCount:  654, description: "シンプルで高速なプロジェクト管理ツール", abbr: "LI", avatarClass: "av-linear" },
-      { name: "Notion",         slug: "notion",  score: 4.3, reviewCount: 1893, description: "ノート・Wiki・タスク管理を統合したワークスペース", abbr: "No", avatarClass: "av-notion" },
-    ],
-  },
-  "design-tools": {
-    name: "デザインツール",
-    description: "UI/UXデザイン・プロトタイピング・グラフィック制作ツール",
-    reviewTotal: "3,424",
-    badgeClass: "dsgn",
-    badgeLabel: "◈ デザインツール",
-    services: [
-      { name: "Figma",  slug: "figma",  score: 4.7, reviewCount: 1890, description: "クラウドUIデザイン・共同編集",              abbr: "FG", avatarClass: "av-figma" },
-      { name: "Framer", slug: "framer", score: 4.4, reviewCount:  432, description: "インタラクティブデザイン・実装",            abbr: "FR", avatarClass: "av-framer" },
-      { name: "Canva",  slug: "canva",  score: 4.3, reviewCount: 1102, description: "ノンデザイナー向け・テンプレ豊富",         abbr: "CA", avatarClass: "av-canva" },
-    ],
-  },
-  "marketing": {
-    name: "マーケSaaS",
-    description: "マーケティング・分析・広告運用に特化したSaaSツール",
-    reviewTotal: "2,832",
-    badgeClass: "mkt",
-    badgeLabel: "◎ マーケSaaS",
-    services: [
-      { name: "HubSpot", slug: "hubspot", score: 4.3, reviewCount: 1102, description: "CRM・マーケ・営業の統合プラットフォーム", abbr: "HS", avatarClass: "av-hubspot" },
-      { name: "Notion",  slug: "notion",  score: 4.2, reviewCount:  987, description: "ドキュメント・Wiki・プロジェクト管理",    abbr: "No", avatarClass: "av-notion" },
-      { name: "Slack",   slug: "slack",   score: 4.1, reviewCount:  743, description: "チームコミュニケーションツール",           abbr: "SL", avatarClass: "av-slack" },
-    ],
-  },
-};
 
 function StarRating({ score }: { score: number }) {
   return (
@@ -93,8 +27,21 @@ function StarRating({ score }: { score: number }) {
 
 export default async function CategoryPage({ params }: Props) {
   const { category } = await params;
-  const data = MOCK_CATEGORIES[category];
-  if (!data) notFound();
+
+  const categoryData = await prisma.category.findUnique({
+    where: { slug: category },
+    include: { services: { orderBy: { score: 'desc' } } },
+  });
+  if (!categoryData) notFound();
+
+  const meta = CATEGORY_META[category] ?? {
+    name: categoryData.name,
+    description: categoryData.description ?? '',
+    badgeClass: '',
+    badgeLabel: categoryData.name,
+  };
+
+  const reviewTotal = categoryData.services.reduce((sum, s) => sum + s.reviewCount, 0);
 
   return (
     <div className="pr-page">
@@ -171,7 +118,7 @@ export default async function CategoryPage({ params }: Props) {
               ホーム
             </Link>
             <span>›</span>
-            <span style={{ color: 'var(--pr-text-pri)' }}>{data.name}</span>
+            <span style={{ color: 'var(--pr-text-pri)' }}>{meta.name}</span>
           </nav>
 
           {/* ページヘッダー */}
@@ -188,7 +135,7 @@ export default async function CategoryPage({ params }: Props) {
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <span className={`pr-cat-badge ${data.badgeClass}`}>{data.badgeLabel}</span>
+                <span className={`pr-cat-badge ${meta.badgeClass}`}>{meta.badgeLabel}</span>
                 <h1 style={{
                   fontSize: '1.3rem',
                   fontWeight: 700,
@@ -196,15 +143,15 @@ export default async function CategoryPage({ params }: Props) {
                   letterSpacing: '-.02em',
                   margin: 0,
                 }}>
-                  {data.name}
+                  {meta.name}
                 </h1>
               </div>
               <p style={{ fontSize: '.82rem', color: 'var(--pr-text-sec)', margin: 0 }}>
-                {data.description}
+                {meta.description}
               </p>
               <p style={{ fontSize: '.75rem', color: 'var(--pr-text-ter)', marginTop: '6px' }}>
-                <strong style={{ color: 'var(--pr-text-sec)' }}>{data.services.length}件</strong>のサービス・
-                <strong style={{ color: 'var(--pr-text-sec)' }}>{data.reviewTotal}件</strong>のレビュー収録
+                <strong style={{ color: 'var(--pr-text-sec)' }}>{categoryData.services.length}件</strong>のサービス・
+                <strong style={{ color: 'var(--pr-text-sec)' }}>{reviewTotal.toLocaleString()}件</strong>のレビュー収録
               </p>
             </div>
             <Link href="/review/new" className="pr-btn-primary" style={{ flexShrink: 0 }}>
@@ -213,7 +160,7 @@ export default async function CategoryPage({ params }: Props) {
           </div>
 
           {/* ランキングセクション */}
-          {data.services.length === 0 ? (
+          {categoryData.services.length === 0 ? (
             <div style={{
               textAlign: 'center',
               padding: '60px 20px',
@@ -236,23 +183,25 @@ export default async function CategoryPage({ params }: Props) {
               </div>
 
               <ul className="pr-rank-list">
-                {data.services.map((service, i) => {
+                {categoryData.services.map((service, i) => {
                   const rank = i + 1;
                   let rankClass = 'pr-rank-num';
                   if (rank === 1) rankClass += ' top1';
                   else if (rank === 2) rankClass += ' top2';
                   else if (rank === 3) rankClass += ' top3';
                   const pct = Math.round((service.score / 5) * 100);
+                  const abbr = getServiceAbbr(service.slug, service.name);
+                  const avatarClass = getServiceAvatarClass(service.slug);
 
                   return (
                     <li key={service.slug}>
                       <Link href={`/${category}/${service.slug}`} className="pr-rank-row">
                         <span className={rankClass}>{rank}</span>
                         <div className="pr-service-info">
-                          <span className={`pr-service-avatar ${service.avatarClass}`}>{service.abbr}</span>
+                          <span className={`pr-service-avatar ${avatarClass}`}>{abbr}</span>
                           <div className="pr-service-text">
                             <span className="pr-service-name">{service.name}</span>
-                            <span className="pr-service-desc">{service.description}</span>
+                            <span className="pr-service-desc">{service.description ?? ''}</span>
                           </div>
                         </div>
                         <div className="pr-score-area">

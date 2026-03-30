@@ -1,133 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
 
 interface Props {
   params: Promise<{ category: string; slug: string }>;
-}
-
-const MOCK_SERVICES: Record<string, {
-  name: string;
-  abbr: string;
-  avatarClass: string;
-  category: string;
-  categoryLabel: string;
-  categoryBadgeClass: string;
-  score: number;
-  reviewCount: number;
-  description: string;
-  website: string;
-  scores: { usability: number; value: number; support: number; features: number };
-}> = {
-  chatgpt: {
-    name: 'ChatGPT',
-    abbr: 'GP',
-    avatarClass: 'av-chatgpt',
-    category: 'ai-tools',
-    categoryLabel: 'AIツール',
-    categoryBadgeClass: 'ai',
-    score: 4.6,
-    reviewCount: 1204,
-    description: 'OpenAIが提供する汎用AIアシスタント。文章生成・コーディング・翻訳など幅広く活用できる大規模言語モデル。',
-    website: 'https://chat.openai.com',
-    scores: { usability: 4.7, value: 4.2, support: 3.9, features: 4.8 },
-  },
-  linear: {
-    name: 'Linear',
-    abbr: 'LI',
-    avatarClass: 'av-linear',
-    category: 'dev-tools',
-    categoryLabel: '開発ツール',
-    categoryBadgeClass: 'dev',
-    score: 4.8,
-    reviewCount: 538,
-    description: 'シンプルで高速なプロジェクト管理ツール。エンジニアチーム向けに最適化されたUIと豊富なショートカットが特徴。',
-    website: 'https://linear.app',
-    scores: { usability: 4.9, value: 4.6, support: 4.4, features: 4.7 },
-  },
-  figma: {
-    name: 'Figma',
-    abbr: 'FG',
-    avatarClass: 'av-figma',
-    category: 'design-tools',
-    categoryLabel: 'デザインツール',
-    categoryBadgeClass: 'dsgn',
-    score: 4.7,
-    reviewCount: 921,
-    description: 'ブラウザベースのUIデザインツール。リアルタイム共同編集・プロトタイピング・デザインシステム管理が一体化。',
-    website: 'https://figma.com',
-    scores: { usability: 4.8, value: 4.3, support: 4.5, features: 4.9 },
-  },
-  claude: {
-    name: 'Claude',
-    abbr: 'CL',
-    avatarClass: 'av-claude',
-    category: 'ai-tools',
-    categoryLabel: 'AIツール',
-    categoryBadgeClass: 'ai',
-    score: 4.5,
-    reviewCount: 742,
-    description: 'Anthropicが開発するAIアシスタント。長文処理・安全性・指示への正確な追随が評価されている。',
-    website: 'https://claude.ai',
-    scores: { usability: 4.6, value: 4.3, support: 4.0, features: 4.5 },
-  },
-  notion: {
-    name: 'Notion',
-    abbr: 'No',
-    avatarClass: 'av-notion',
-    category: 'dev-tools',
-    categoryLabel: '開発ツール',
-    categoryBadgeClass: 'dev',
-    score: 4.3,
-    reviewCount: 1893,
-    description: 'ノート・Wiki・タスク管理を統合したオールインワンワークスペース。柔軟なブロック構造で幅広い用途に対応。',
-    website: 'https://notion.so',
-    scores: { usability: 4.2, value: 4.5, support: 3.8, features: 4.6 },
-  },
-};
-
-const MOCK_REVIEWS = [
-  {
-    id: 1,
-    author: 'tanaka_dev',
-    score: 5,
-    date: '2026-03-15',
-    text: '使い始めてから業務効率が大幅に上がりました。特に複雑なタスクへの対応力が素晴らしい。UIもシンプルで迷わず使えます。',
-    verified: true,
-  },
-  {
-    id: 2,
-    author: 'suzuki_designer',
-    score: 4,
-    date: '2026-03-08',
-    text: '全体的に満足度高め。ただ無料プランの制限が少し厳しいと感じる場面がありました。有料プランにすれば問題ないと思います。',
-    verified: true,
-  },
-  {
-    id: 3,
-    author: 'yamamoto_pm',
-    score: 4,
-    date: '2026-02-27',
-    text: 'チームで使い始めて3ヶ月。サポートのレスポンスが早く、困ったときにすぐ対応してもらえた点が特に良かったです。',
-    verified: false,
-  },
-];
-
-function StarRating({ score }: { score: number }) {
-  return (
-    <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <svg
-          key={i}
-          width="14"
-          height="14"
-          viewBox="0 0 20 20"
-          fill={i <= Math.round(score) ? '#d97706' : 'var(--pr-surface-3)'}
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
 }
 
 function ScoreBar({ label, score }: { label: string; score: number }) {
@@ -156,10 +33,36 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { category, slug } = await params;
-  const service = MOCK_SERVICES[slug];
+
+  const service = await prisma.service.findFirst({
+    where: { slug, category: { slug: category } },
+    include: {
+      category: true,
+      reviews: { orderBy: { createdAt: 'desc' }, take: 20, include: { user: true } },
+    },
+  });
   if (!service) notFound();
 
+  const reviews = service.reviews;
+  const avgScores = reviews.length > 0
+    ? {
+        overall:   reviews.reduce((s, r) => s + r.overall,   0) / reviews.length,
+        usability: reviews.reduce((s, r) => s + r.usability, 0) / reviews.length,
+        value:     reviews.reduce((s, r) => s + r.value,     0) / reviews.length,
+        support:   reviews.reduce((s, r) => s + r.support,   0) / reviews.length,
+      }
+    : null;
+
   const scorePct = Math.round((service.score / 5) * 100);
+  const abbr = getServiceAbbr(service.slug, service.name);
+  const avatarClass = getServiceAvatarClass(service.slug);
+
+  const catMeta = CATEGORY_META[category] ?? {
+    name: service.category.name,
+    description: service.category.description ?? '',
+    badgeClass: '',
+    badgeLabel: service.category.name,
+  };
 
   return (
     <div className="pr-page">
@@ -236,10 +139,10 @@ export default async function ServiceDetailPage({ params }: Props) {
               ホーム
             </Link>
             <span>›</span>
-            <Link href={`/${service.category}`} style={{ color: 'var(--pr-text-ter)', textDecoration: 'none', transition: 'color .15s' }}
+            <Link href={`/${category}`} style={{ color: 'var(--pr-text-ter)', textDecoration: 'none', transition: 'color .15s' }}
               onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--pr-accent)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--pr-text-ter)')}>
-              {service.categoryLabel}
+              {catMeta.name}
             </Link>
             <span>›</span>
             <span style={{ color: 'var(--pr-text-pri)' }}>{service.name}</span>
@@ -257,40 +160,42 @@ export default async function ServiceDetailPage({ params }: Props) {
               {/* 左：サービス情報 */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <span className={`pr-service-avatar ${service.avatarClass}`} style={{ width: '40px', height: '40px', fontSize: '.85rem' }}>
-                    {service.abbr}
+                  <span className={`pr-service-avatar ${avatarClass}`} style={{ width: '40px', height: '40px', fontSize: '.85rem' }}>
+                    {abbr}
                   </span>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--pr-text-pri)', letterSpacing: '-.02em', margin: 0 }}>
                         {service.name}
                       </h1>
-                      <span className={`pr-cat-badge ${service.categoryBadgeClass}`}>{service.categoryLabel}</span>
+                      <span className={`pr-cat-badge ${catMeta.badgeClass}`}>{catMeta.name}</span>
                     </div>
                   </div>
                 </div>
                 <p style={{ fontSize: '.875rem', color: 'var(--pr-text-sec)', lineHeight: 1.65, marginBottom: '12px' }}>
-                  {service.description}
+                  {service.description ?? ''}
                 </p>
-                <a
-                  href={service.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '.8rem',
-                    color: 'var(--pr-accent)',
-                    textDecoration: 'none',
-                    fontWeight: 500,
-                  }}
-                >
-                  公式サイトを見る
-                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M11 3H17V9M17 3L9 11M7 5H5C3.9 5 3 5.9 3 7v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
+                {service.website && (
+                  <a
+                    href={service.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '.8rem',
+                      color: 'var(--pr-accent)',
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                    }}
+                  >
+                    公式サイトを見る
+                    <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 3H17V9M17 3L9 11M7 5H5C3.9 5 3 5.9 3 7v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                )}
               </div>
 
               {/* 右：スコア */}
@@ -327,36 +232,38 @@ export default async function ServiceDetailPage({ params }: Props) {
             </div>
           </section>
 
-          {/* ===== スコアブレークダウン ===== */}
-          <section style={{
-            background: 'var(--pr-surface)',
-            border: '1px solid var(--pr-border)',
-            borderRadius: '12px',
-            padding: '20px 24px',
-            marginBottom: '16px',
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+          {/* ===== スコアブレークダウン（レビューがある場合のみ） ===== */}
+          {avgScores && (
+            <section style={{
+              background: 'var(--pr-surface)',
+              border: '1px solid var(--pr-border)',
+              borderRadius: '12px',
+              padding: '20px 24px',
               marginBottom: '16px',
-              paddingBottom: '12px',
-              borderBottom: '1px solid var(--pr-border)',
             }}>
-              <h2 style={{ fontSize: '.95rem', fontWeight: 600, color: 'var(--pr-text-pri)', margin: 0 }}>
-                なぜこのスコアなのか
-              </h2>
-              <Link href="/transparency" style={{ fontSize: '.78rem', color: 'var(--pr-accent)', textDecoration: 'none' }}>
-                計算式を見る →
-              </Link>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <ScoreBar label="使いやすさ" score={service.scores.usability} />
-              <ScoreBar label="コスパ" score={service.scores.value} />
-              <ScoreBar label="サポート" score={service.scores.support} />
-              <ScoreBar label="機能性" score={service.scores.features} />
-            </div>
-          </section>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '16px',
+                paddingBottom: '12px',
+                borderBottom: '1px solid var(--pr-border)',
+              }}>
+                <h2 style={{ fontSize: '.95rem', fontWeight: 600, color: 'var(--pr-text-pri)', margin: 0 }}>
+                  なぜこのスコアなのか
+                </h2>
+                <Link href="/transparency" style={{ fontSize: '.78rem', color: 'var(--pr-accent)', textDecoration: 'none' }}>
+                  計算式を見る →
+                </Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <ScoreBar label="総合評価"   score={avgScores.overall} />
+                <ScoreBar label="使いやすさ" score={avgScores.usability} />
+                <ScoreBar label="コスパ"     score={avgScores.value} />
+                <ScoreBar label="サポート"   score={avgScores.support} />
+              </div>
+            </section>
+          )}
 
           {/* ===== レビュー一覧 ===== */}
           <section>
@@ -381,47 +288,65 @@ export default async function ServiceDetailPage({ params }: Props) {
               </Link>
             </div>
 
-            <div style={{ background: 'var(--pr-surface)', border: '1px solid var(--pr-border)', borderRadius: '12px', overflow: 'hidden' }}>
-              {MOCK_REVIEWS.map((review, idx) => (
-                <div
-                  key={review.id}
-                  style={{
-                    padding: '16px',
-                    borderBottom: idx < MOCK_REVIEWS.length - 1 ? '1px solid var(--pr-border)' : 'none',
-                  }}
-                >
-                  {/* レビューヘッダー */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div className="pr-reviewer-avatar">
-                        {review.author[0].toUpperCase()}
-                      </div>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--pr-text-pri)' }}>
-                            {review.author}
-                          </span>
-                          {review.verified && (
-                            <span className="pr-verified-badge">✓ 確認済み</span>
-                          )}
+            {reviews.length === 0 ? (
+              <div style={{
+                background: 'var(--pr-surface)',
+                border: '1px solid var(--pr-border)',
+                borderRadius: '12px',
+                padding: '40px 20px',
+                textAlign: 'center',
+                color: 'var(--pr-text-ter)',
+              }}>
+                <p style={{ fontSize: '.9rem', marginBottom: '8px' }}>まだレビューがありません</p>
+                <p style={{ fontSize: '.82rem' }}>最初のレビューを投稿してみませんか？</p>
+              </div>
+            ) : (
+              <div style={{ background: 'var(--pr-surface)', border: '1px solid var(--pr-border)', borderRadius: '12px', overflow: 'hidden' }}>
+                {reviews.map((review, idx) => {
+                  const authorName = review.user.name ?? 'ユーザー';
+                  const initial = authorName[0].toUpperCase();
+                  const stars = Math.round(review.overall);
+                  const dateStr = review.createdAt.toISOString().split('T')[0];
+                  return (
+                    <div
+                      key={review.id}
+                      style={{
+                        padding: '16px',
+                        borderBottom: idx < reviews.length - 1 ? '1px solid var(--pr-border)' : 'none',
+                      }}
+                    >
+                      {/* レビューヘッダー */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div className="pr-reviewer-avatar">
+                            {initial}
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--pr-text-pri)' }}>
+                                {authorName}
+                              </span>
+                              <span className="pr-verified-badge">✓ 確認済み</span>
+                            </div>
+                            <span style={{ fontSize: '.7rem', color: 'var(--pr-text-ter)' }}>{dateStr}</span>
+                          </div>
                         </div>
-                        <span style={{ fontSize: '.7rem', color: 'var(--pr-text-ter)' }}>{review.date}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span className="pr-review-stars">{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
+                          <span style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--pr-text-pri)', fontVariantNumeric: 'tabular-nums' }}>
+                            {review.overall.toFixed(1)}
+                          </span>
+                        </div>
                       </div>
+                      {/* レビュー本文 */}
+                      <p style={{ fontSize: '.82rem', color: 'var(--pr-text-sec)', lineHeight: 1.6, margin: 0 }}>
+                        {review.body}
+                      </p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span className="pr-review-stars">{'★'.repeat(review.score)}{'☆'.repeat(5 - review.score)}</span>
-                      <span style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--pr-text-pri)', fontVariantNumeric: 'tabular-nums' }}>
-                        {review.score}.0
-                      </span>
-                    </div>
-                  </div>
-                  {/* レビュー本文 */}
-                  <p style={{ fontSize: '.82rem', color: 'var(--pr-text-sec)', lineHeight: 1.6, margin: 0 }}>
-                    {review.text}
-                  </p>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
         </div>

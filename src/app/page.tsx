@@ -1,29 +1,6 @@
 import Link from 'next/link';
-
-// ランキングデータ
-const AI_TOOLS = [
-  { slug: 'chatgpt',  abbr: 'GP', name: 'ChatGPT',       desc: 'OpenAI の汎用AIアシスタント',    score: 4.8, reviews: 2341, pct: 96, avatarClass: 'av-chatgpt', rank: 1 },
-  { slug: 'claude',   abbr: 'CL', name: 'Claude',        desc: 'Anthropic 製・長文処理に強い',    score: 4.7, reviews: 1823, pct: 94, avatarClass: 'av-claude',  rank: 2 },
-  { slug: 'cursor',   abbr: 'CU', name: 'Cursor',        desc: 'AIコードエディタ・開発者向け',    score: 4.6, reviews:  956, pct: 92, avatarClass: 'av-cursor',  rank: 3 },
-];
-
-const DEV_TOOLS = [
-  { slug: 'copilot',  abbr: 'CO', name: 'GitHub Copilot', desc: 'AIペアプログラマー・VS Code連携', score: 4.5, reviews: 1204, pct: 90, avatarClass: 'av-copilot', rank: 1 },
-  { slug: 'vercel',   abbr: 'VE', name: 'Vercel',         desc: 'フロントエンドホスティング',      score: 4.4, reviews:  782, pct: 88, avatarClass: 'av-vercel',  rank: 2 },
-  { slug: 'linear',   abbr: 'LI', name: 'Linear',         desc: 'プロジェクト管理・チーム向け',    score: 4.3, reviews:  654, pct: 86, avatarClass: 'av-linear',  rank: 3 },
-];
-
-const DESIGN_TOOLS = [
-  { slug: 'figma',    abbr: 'FG', name: 'Figma',   desc: 'クラウドUIデザイン・共同編集',        score: 4.6, reviews: 1890, pct: 92, avatarClass: 'av-figma',  rank: 1 },
-  { slug: 'framer',   abbr: 'FR', name: 'Framer',  desc: 'インタラクティブデザイン・実装',      score: 4.4, reviews:  432, pct: 88, avatarClass: 'av-framer', rank: 2 },
-  { slug: 'canva',    abbr: 'CA', name: 'Canva',   desc: 'ノンデザイナー向け・テンプレ豊富',   score: 4.3, reviews: 1102, pct: 86, avatarClass: 'av-canva',  rank: 3 },
-];
-
-const MARKETING_TOOLS = [
-  { slug: 'hubspot',  abbr: 'HS', name: 'HubSpot', desc: 'CRM・マーケ・営業の統合プラットフォーム', score: 4.3, reviews: 1102, pct: 86, avatarClass: 'av-hubspot', rank: 1 },
-  { slug: 'notion',   abbr: 'No', name: 'Notion',  desc: 'ドキュメント・Wiki・プロジェクト管理',    score: 4.2, reviews:  987, pct: 84, avatarClass: 'av-notion',  rank: 2 },
-  { slug: 'slack',    abbr: 'SL', name: 'Slack',   desc: 'チームコミュニケーションツール',          score: 4.1, reviews:  743, pct: 82, avatarClass: 'av-slack',   rank: 3 },
-];
+import { prisma } from '@/lib/prisma';
+import { getServiceAbbr, getServiceAvatarClass } from '@/lib/service-meta';
 
 const TRENDING = [
   { abbr: 'GM', name: 'Gemini Advanced',  change: '+48% レビュー増', avatarClass: 'av-gemini' },
@@ -31,39 +8,6 @@ const TRENDING = [
   { abbr: 'LI', name: 'Linear',           change: '+22% レビュー増', avatarClass: 'av-linear' },
   { abbr: 'FR', name: 'Framer',           change: '+18% レビュー増', avatarClass: 'av-framer' },
   { abbr: 'GH', name: 'GitHub Copilot',   change: '+15% レビュー増', avatarClass: 'av-github' },
-];
-
-const RECENT_REVIEWS = [
-  {
-    initials: 'YA',
-    name: '@dev_yamada',
-    stars: '★★★★★',
-    target: 'ChatGPT',
-    body: 'プロンプトの精度が上がってから格段に使いやすくなった。特に長文要約は他ツールと比べて頭一つ抜けている印象。日本語対応も改善が続いており、業務への組み込みが進んでいる。',
-    date: '2026-03-29',
-    helpful: 24,
-    avatarStyle: undefined as string | undefined,
-  },
-  {
-    initials: 'MK',
-    name: '@mktg_kato',
-    stars: '★★★☆☆',
-    target: 'Notion',
-    body: '価格改定後にコスパが落ちた印象。AI機能が使えるのは便利だが、月額が上がってからチームへの導入を再検討している。代替ツールも合わせて評価中。',
-    date: '2026-03-28',
-    helpful: 11,
-    avatarStyle: 'background:linear-gradient(135deg,#7c3aed,#9333ea)',
-  },
-  {
-    initials: 'SZ',
-    name: '@suzuki_eng',
-    stars: '★★★★☆',
-    target: 'Linear',
-    body: 'Jiraより圧倒的に軽くて使いやすい。サイクル管理の概念が最初は慣れないが、慣れたらスプリント管理がとても楽になった。小〜中規模チームに強くおすすめできる。',
-    date: '2026-03-27',
-    helpful: 8,
-    avatarStyle: 'background:linear-gradient(135deg,#16a34a,#15803d)',
-  },
 ];
 
 interface RankItem {
@@ -161,7 +105,59 @@ function CategorySection({
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [
+    aiToolsRaw,
+    devToolsRaw,
+    designToolsRaw,
+    marketingToolsRaw,
+    reviewCount,
+    serviceCount,
+    categoryCount,
+    recentReviewsRaw,
+    aiToolsCount,
+    devToolsCount,
+    designToolsCount,
+    marketingToolsCount,
+  ] = await Promise.all([
+    prisma.service.findMany({ where: { category: { slug: 'ai-tools' } },      orderBy: { score: 'desc' }, take: 3 }),
+    prisma.service.findMany({ where: { category: { slug: 'dev-tools' } },     orderBy: { score: 'desc' }, take: 3 }),
+    prisma.service.findMany({ where: { category: { slug: 'design-tools' } },  orderBy: { score: 'desc' }, take: 3 }),
+    prisma.service.findMany({ where: { category: { slug: 'marketing' } },     orderBy: { score: 'desc' }, take: 3 }),
+    prisma.review.count(),
+    prisma.service.count(),
+    prisma.category.count(),
+    prisma.review.findMany({ orderBy: { createdAt: 'desc' }, take: 3, include: { user: true, service: true } }),
+    prisma.service.count({ where: { category: { slug: 'ai-tools' } } }),
+    prisma.service.count({ where: { category: { slug: 'dev-tools' } } }),
+    prisma.service.count({ where: { category: { slug: 'design-tools' } } }),
+    prisma.service.count({ where: { category: { slug: 'marketing' } } }),
+  ]);
+
+  function toRankItems(services: typeof aiToolsRaw): RankItem[] {
+    return services.map((s, i) => ({
+      slug: s.slug,
+      abbr: getServiceAbbr(s.slug, s.name),
+      name: s.name,
+      desc: s.description ?? '',
+      score: s.score,
+      reviews: s.reviewCount,
+      pct: Math.round((s.score / 5) * 100),
+      avatarClass: getServiceAvatarClass(s.slug),
+      rank: i + 1,
+    }));
+  }
+
+  const aiTools       = toRankItems(aiToolsRaw);
+  const devTools      = toRankItems(devToolsRaw);
+  const designTools   = toRankItems(designToolsRaw);
+  const marketingTools = toRankItems(marketingToolsRaw);
+
+  const aiReviewCount      = aiToolsRaw.reduce((s, r) => s + r.reviewCount, 0);
+  const devReviewCount     = devToolsRaw.reduce((s, r) => s + r.reviewCount, 0);
+  const designReviewCount  = designToolsRaw.reduce((s, r) => s + r.reviewCount, 0);
+  const mktReviewCount     = marketingToolsRaw.reduce((s, r) => s + r.reviewCount, 0);
+
   return (
     <div className="pr-page">
       {/* ===== ヘッダー ===== */}
@@ -233,15 +229,15 @@ export default function HomePage() {
 
             <div className="pr-hero-stats-block">
               <div className="pr-stat-card">
-                <span className="pr-stat-num">9,840+</span>
+                <span className="pr-stat-num">{reviewCount.toLocaleString()}+</span>
                 <span className="pr-stat-label">件のレビュー</span>
               </div>
               <div className="pr-stat-card">
-                <span className="pr-stat-num">210+</span>
+                <span className="pr-stat-num">{serviceCount.toLocaleString()}+</span>
                 <span className="pr-stat-label">サービス掲載</span>
               </div>
               <div className="pr-stat-card">
-                <span className="pr-stat-num">6</span>
+                <span className="pr-stat-num">{categoryCount}</span>
                 <span className="pr-stat-label">カテゴリ</span>
               </div>
             </div>
@@ -282,11 +278,11 @@ export default function HomePage() {
                 badgeClass="ai"
                 badgeLabel="✦ AIツール"
                 title="AI ツール"
-                reviewCount="5,120件"
+                reviewCount={`${aiReviewCount.toLocaleString()}件`}
                 seeAllHref="/ai-tools"
-                totalCount="14"
+                totalCount={String(aiToolsCount)}
                 moreLabel="AIツールをもっと見る"
-                items={AI_TOOLS}
+                items={aiTools}
                 categorySlug="ai-tools"
               />
 
@@ -295,11 +291,11 @@ export default function HomePage() {
                 badgeClass="dev"
                 badgeLabel="⚙ 開発ツール"
                 title="開発ツール"
-                reviewCount="2,640件"
+                reviewCount={`${devReviewCount.toLocaleString()}件`}
                 seeAllHref="/dev-tools"
-                totalCount="22"
+                totalCount={String(devToolsCount)}
                 moreLabel="開発ツールをもっと見る"
-                items={DEV_TOOLS}
+                items={devTools}
                 categorySlug="dev-tools"
               />
 
@@ -308,11 +304,11 @@ export default function HomePage() {
                 badgeClass="dsgn"
                 badgeLabel="◈ デザインツール"
                 title="デザインツール"
-                reviewCount="2,535件"
+                reviewCount={`${designReviewCount.toLocaleString()}件`}
                 seeAllHref="/design-tools"
-                totalCount="18"
+                totalCount={String(designToolsCount)}
                 moreLabel="デザインツールをもっと見る"
-                items={DESIGN_TOOLS}
+                items={designTools}
                 categorySlug="design-tools"
               />
 
@@ -321,47 +317,52 @@ export default function HomePage() {
                 badgeClass="mkt"
                 badgeLabel="◎ マーケSaaS"
                 title="マーケSaaS"
-                reviewCount="2,545件"
+                reviewCount={`${mktReviewCount.toLocaleString()}件`}
                 seeAllHref="/marketing"
-                totalCount="19"
+                totalCount={String(marketingToolsCount)}
                 moreLabel="マーケSaaSをもっと見る"
-                items={MARKETING_TOOLS}
+                items={marketingTools}
                 categorySlug="marketing"
               />
 
               {/* 最新レビュー */}
-              <div>
-                <div className="pr-section-h2">
-                  最新のレビュー
-                  <div className="pr-section-h2-line"></div>
-                </div>
+              {recentReviewsRaw.length > 0 && (
+                <div>
+                  <div className="pr-section-h2">
+                    最新のレビュー
+                    <div className="pr-section-h2-line"></div>
+                  </div>
 
-                <section className="pr-recent-reviews-section">
-                  <ul className="pr-review-feed">
-                    {RECENT_REVIEWS.map((review, i) => (
-                      <li key={i} className="pr-review-feed-item">
-                        <div className="pr-review-feed-header">
-                          <div
-                            className="pr-reviewer-avatar"
-                            style={review.avatarStyle ? { background: review.avatarStyle.replace('background:', '') } : undefined}
-                          >
-                            {review.initials}
-                          </div>
-                          <span className="pr-reviewer-name">{review.name}</span>
-                          <span className="pr-verified-badge">認証済み</span>
-                          <span className="pr-review-stars">{review.stars}</span>
-                          <span className="pr-review-target">{review.target}</span>
-                        </div>
-                        <p className="pr-review-body">{review.body}</p>
-                        <div className="pr-review-footer">
-                          <span className="pr-review-date">{review.date}</span>
-                          <span className="pr-review-helpful">👍 参考になった ({review.helpful})</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              </div>
+                  <section className="pr-recent-reviews-section">
+                    <ul className="pr-review-feed">
+                      {recentReviewsRaw.map((review) => {
+                        const userName = review.user.name ?? 'ユーザー';
+                        const initials = userName.slice(0, 2).toUpperCase();
+                        const stars = Math.round(review.overall);
+                        const starsStr = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+                        const dateStr = review.createdAt.toISOString().split('T')[0];
+                        return (
+                          <li key={review.id} className="pr-review-feed-item">
+                            <div className="pr-review-feed-header">
+                              <div className="pr-reviewer-avatar">
+                                {initials}
+                              </div>
+                              <span className="pr-reviewer-name">@{userName}</span>
+                              <span className="pr-verified-badge">認証済み</span>
+                              <span className="pr-review-stars">{starsStr}</span>
+                              <span className="pr-review-target">{review.service.name}</span>
+                            </div>
+                            <p className="pr-review-body">{review.body}</p>
+                            <div className="pr-review-footer">
+                              <span className="pr-review-date">{dateStr}</span>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                </div>
+              )}
 
             </div>{/* /.main-col */}
 
@@ -375,32 +376,32 @@ export default function HomePage() {
                   <Link href="/ai-tools" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">✦</span>
                     <span className="pr-cat-grid-name">AIツール</span>
-                    <span className="pr-cat-grid-count">14サービス</span>
+                    <span className="pr-cat-grid-count">{aiToolsCount}サービス</span>
                   </Link>
                   <Link href="/dev-tools" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">⚙</span>
                     <span className="pr-cat-grid-name">開発ツール</span>
-                    <span className="pr-cat-grid-count">22サービス</span>
+                    <span className="pr-cat-grid-count">{devToolsCount}サービス</span>
                   </Link>
                   <Link href="/design-tools" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">◈</span>
                     <span className="pr-cat-grid-name">デザイン</span>
-                    <span className="pr-cat-grid-count">18サービス</span>
+                    <span className="pr-cat-grid-count">{designToolsCount}サービス</span>
                   </Link>
                   <Link href="/marketing" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">◎</span>
                     <span className="pr-cat-grid-name">マーケSaaS</span>
-                    <span className="pr-cat-grid-count">19サービス</span>
+                    <span className="pr-cat-grid-count">{marketingToolsCount}サービス</span>
                   </Link>
                   <Link href="/productivity" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">▶</span>
                     <span className="pr-cat-grid-name">生産性</span>
-                    <span className="pr-cat-grid-count">31サービス</span>
+                    <span className="pr-cat-grid-count">0サービス</span>
                   </Link>
                   <Link href="/security" className="pr-cat-grid-item">
                     <span className="pr-cat-grid-icon">◉</span>
                     <span className="pr-cat-grid-name">セキュリティ</span>
-                    <span className="pr-cat-grid-count">16サービス</span>
+                    <span className="pr-cat-grid-count">0サービス</span>
                   </Link>
                 </div>
               </div>
