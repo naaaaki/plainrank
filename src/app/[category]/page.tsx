@@ -8,47 +8,81 @@ interface Props {
 const MOCK_CATEGORIES: Record<string, {
   name: string;
   description: string;
-  services: { name: string; slug: string; score: number; reviewCount: number; description: string }[];
+  reviewTotal: string;
+  badgeClass: string;
+  badgeLabel: string;
+  services: {
+    name: string;
+    slug: string;
+    score: number;
+    reviewCount: number;
+    description: string;
+    abbr: string;
+    avatarClass: string;
+  }[];
 }> = {
   "ai-tools": {
     name: "AIツール",
     description: "ChatGPT・Claude・Geminiなど、生成AIアシスタントから特化型ツールまで",
+    reviewTotal: "7,823",
+    badgeClass: "ai",
+    badgeLabel: "✦ AIツール",
     services: [
-      { name: "ChatGPT", slug: "chatgpt", score: 4.6, reviewCount: 1204, description: "OpenAIが提供する汎用AIアシスタント" },
-      { name: "Claude", slug: "claude", score: 4.5, reviewCount: 742, description: "Anthropicが開発するAIアシスタント" },
+      { name: "ChatGPT", slug: "chatgpt", score: 4.8, reviewCount: 2341, description: "OpenAIが提供する汎用AIアシスタント", abbr: "GP", avatarClass: "av-chatgpt" },
+      { name: "Claude",  slug: "claude",  score: 4.7, reviewCount: 1823, description: "Anthropicが開発するAIアシスタント",   abbr: "CL", avatarClass: "av-claude" },
+      { name: "Cursor",  slug: "cursor",  score: 4.6, reviewCount:  956, description: "AIコードエディタ・開発者向け",         abbr: "CU", avatarClass: "av-cursor" },
+      { name: "Gemini",  slug: "gemini",  score: 4.4, reviewCount:  620, description: "Googleが開発するAIアシスタント",       abbr: "GM", avatarClass: "av-gemini" },
     ],
   },
   "dev-tools": {
     name: "開発ツール",
     description: "エンジニア・開発チーム向けのプロジェクト管理・コラボレーションツール",
+    reviewTotal: "4,210",
+    badgeClass: "dev",
+    badgeLabel: "⚙ 開発ツール",
     services: [
-      { name: "Linear", slug: "linear", score: 4.8, reviewCount: 538, description: "シンプルで高速なプロジェクト管理ツール" },
-      { name: "Notion", slug: "notion", score: 4.3, reviewCount: 1893, description: "ノート・Wiki・タスク管理を統合したワークスペース" },
+      { name: "GitHub Copilot", slug: "copilot", score: 4.5, reviewCount: 1204, description: "AIペアプログラマー・VS Code連携",     abbr: "CO", avatarClass: "av-copilot" },
+      { name: "Vercel",         slug: "vercel",  score: 4.4, reviewCount:  782, description: "フロントエンドホスティング",           abbr: "VE", avatarClass: "av-vercel" },
+      { name: "Linear",         slug: "linear",  score: 4.3, reviewCount:  654, description: "シンプルで高速なプロジェクト管理ツール", abbr: "LI", avatarClass: "av-linear" },
+      { name: "Notion",         slug: "notion",  score: 4.3, reviewCount: 1893, description: "ノート・Wiki・タスク管理を統合したワークスペース", abbr: "No", avatarClass: "av-notion" },
     ],
   },
   "design-tools": {
     name: "デザインツール",
     description: "UI/UXデザイン・プロトタイピング・グラフィック制作ツール",
+    reviewTotal: "3,424",
+    badgeClass: "dsgn",
+    badgeLabel: "◈ デザインツール",
     services: [
-      { name: "Figma", slug: "figma", score: 4.7, reviewCount: 921, description: "ブラウザベースのUIデザインツール" },
+      { name: "Figma",  slug: "figma",  score: 4.7, reviewCount: 1890, description: "クラウドUIデザイン・共同編集",              abbr: "FG", avatarClass: "av-figma" },
+      { name: "Framer", slug: "framer", score: 4.4, reviewCount:  432, description: "インタラクティブデザイン・実装",            abbr: "FR", avatarClass: "av-framer" },
+      { name: "Canva",  slug: "canva",  score: 4.3, reviewCount: 1102, description: "ノンデザイナー向け・テンプレ豊富",         abbr: "CA", avatarClass: "av-canva" },
     ],
   },
   "marketing": {
     name: "マーケSaaS",
     description: "マーケティング・分析・広告運用に特化したSaaSツール",
-    services: [],
+    reviewTotal: "2,832",
+    badgeClass: "mkt",
+    badgeLabel: "◎ マーケSaaS",
+    services: [
+      { name: "HubSpot", slug: "hubspot", score: 4.3, reviewCount: 1102, description: "CRM・マーケ・営業の統合プラットフォーム", abbr: "HS", avatarClass: "av-hubspot" },
+      { name: "Notion",  slug: "notion",  score: 4.2, reviewCount:  987, description: "ドキュメント・Wiki・プロジェクト管理",    abbr: "No", avatarClass: "av-notion" },
+      { name: "Slack",   slug: "slack",   score: 4.1, reviewCount:  743, description: "チームコミュニケーションツール",           abbr: "SL", avatarClass: "av-slack" },
+    ],
   },
 };
 
 function StarRating({ score }: { score: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
       {[1, 2, 3, 4, 5].map((i) => (
         <svg
           key={i}
-          className={`w-4 h-4 ${i <= Math.round(score) ? "text-amber-400" : "text-gray-200"}`}
-          fill="currentColor"
+          width="13"
+          height="13"
           viewBox="0 0 20 20"
+          fill={i <= Math.round(score) ? '#d97706' : '#e2e8f0'}
         >
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
@@ -57,103 +91,244 @@ function StarRating({ score }: { score: number }) {
   );
 }
 
-function scoreColor(score: number) {
-  if (score >= 4.5) return "text-green-600";
-  if (score >= 3.5) return "text-amber-600";
-  return "text-red-500";
-}
-
 export default async function CategoryPage({ params }: Props) {
   const { category } = await params;
   const data = MOCK_CATEGORIES[category];
   if (!data) notFound();
 
   return (
-    <main className="min-h-screen bg-white text-[#1E293B]">
-      {/* ヘッダー */}
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-[#2563EB] shrink-0">
-            Plainrank
-          </Link>
-          <div className="flex-1" />
-          <Link
-            href="/auth/signin"
-            className="text-sm font-medium px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
-          >
-            ログイン
-          </Link>
+    <div className="pr-page">
+      {/* ===== ヘッダー ===== */}
+      <header className="pr-header">
+        <div className="pr-container">
+          <div className="pr-header-inner">
+            <Link href="/" className="pr-logo">
+              <span className="pr-logo-icon">P</span>
+              Plainrank
+            </Link>
+
+            <div className="pr-header-search">
+              <span className="pr-search-icon">🔍</span>
+              <input type="text" placeholder="ツール・SaaS・AIを検索..." />
+              <span className="pr-search-kbd">/</span>
+            </div>
+
+            <nav className="pr-header-nav">
+              <Link href="/ranking" className="pr-btn-ghost">ランキング</Link>
+              <Link href="/compare" className="pr-btn-ghost">比較する</Link>
+              <Link href="/review/new" className="pr-btn-ghost">レビューを書く</Link>
+              <Link href="/auth/signin" className="pr-btn-primary">ログイン</Link>
+            </nav>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        {/* パンくず */}
-        <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2">
-          <Link href="/" className="hover:text-[#2563EB] transition-colors">ホーム</Link>
-          <span>/</span>
-          <span className="text-[#1E293B]">{data.name}</span>
-        </nav>
-
-        {/* カテゴリ見出し */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-[#1E293B] mb-2">{data.name}</h1>
-          <p className="text-gray-500">{data.description}</p>
+      {/* ===== カテゴリクイックナビ ===== */}
+      <nav className="pr-cat-nav">
+        <div className="pr-container">
+          <div className="pr-cat-nav-inner">
+            <Link href="/" className="pr-cat-nav-item">
+              <span className="pr-cat-nav-dot" style={{ background: '#2563EB' }}></span>すべて
+            </Link>
+            <Link href="/ai-tools" className={`pr-cat-nav-item${category === 'ai-tools' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#2563EB' }}></span>AIツール
+            </Link>
+            <Link href="/dev-tools" className={`pr-cat-nav-item${category === 'dev-tools' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#16a34a' }}></span>開発ツール
+            </Link>
+            <Link href="/design-tools" className={`pr-cat-nav-item${category === 'design-tools' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#7c3aed' }}></span>デザインツール
+            </Link>
+            <Link href="/marketing" className={`pr-cat-nav-item${category === 'marketing' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#b45309' }}></span>マーケSaaS
+            </Link>
+            <Link href="/productivity" className={`pr-cat-nav-item${category === 'productivity' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#dc2626' }}></span>生産性
+            </Link>
+            <Link href="/security" className={`pr-cat-nav-item${category === 'security' ? ' active' : ''}`}>
+              <span className="pr-cat-nav-dot" style={{ background: '#059669' }}></span>セキュリティ
+            </Link>
+          </div>
         </div>
+      </nav>
 
-        {/* サービス一覧 */}
-        {data.services.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-lg">まだサービスが登録されていません</p>
-            <p className="text-sm mt-2">近日公開予定です</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {data.services.map((service, i) => (
-              <Link
-                key={service.slug}
-                href={`/${category}/${service.slug}`}
-                className="group bg-white border border-gray-100 rounded-xl px-6 py-5 hover:border-[#2563EB] hover:shadow-sm transition-all flex items-center gap-6"
-              >
-                {/* 順位 */}
-                <div className="text-2xl font-bold text-gray-200 w-8 shrink-0 text-center">
-                  {i + 1}
-                </div>
+      {/* ===== メインコンテンツ ===== */}
+      <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
+        <div className="pr-container" style={{ paddingTop: '20px', paddingBottom: '60px' }}>
 
-                {/* サービス情報 */}
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-lg font-semibold text-[#1E293B] group-hover:text-[#2563EB] transition-colors">
-                    {service.name}
-                  </h2>
-                  <p className="text-sm text-gray-500 mt-0.5 truncate">{service.description}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <StarRating score={service.score} />
-                    <span className="text-xs text-gray-400">{service.reviewCount.toLocaleString()} 件</span>
-                  </div>
-                </div>
-
-                {/* スコア */}
-                <div className="shrink-0 text-right">
-                  <div className={`text-3xl font-bold tabular-nums ${scoreColor(service.score)}`}>
-                    {service.score.toFixed(1)}
-                  </div>
-                  <div className="text-xs text-gray-400">/5.0</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* フッター */}
-      <footer className="border-t border-gray-100 py-6 px-6 mt-12">
-        <div className="max-w-6xl mx-auto flex items-center justify-end">
-          <nav className="flex items-center gap-6 text-sm text-gray-400">
-            <Link href="/transparency" className="hover:text-[#2563EB] transition-colors">透明性ポリシー</Link>
-            <Link href="/about" className="hover:text-[#2563EB] transition-colors">About</Link>
-            <a href="https://github.com/naaaaki/plainrank" target="_blank" rel="noopener noreferrer" className="hover:text-[#2563EB] transition-colors">GitHub</a>
+          {/* パンくず */}
+          <nav style={{
+            fontSize: '.78rem',
+            color: 'var(--pr-text-ter)',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}>
+            <Link href="/" style={{ color: 'var(--pr-text-ter)', textDecoration: 'none', transition: 'color .15s' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--pr-accent)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--pr-text-ter)')}>
+              ホーム
+            </Link>
+            <span>›</span>
+            <span style={{ color: 'var(--pr-text-pri)' }}>{data.name}</span>
           </nav>
+
+          {/* ページヘッダー */}
+          <div style={{
+            background: 'var(--pr-surface)',
+            border: '1px solid var(--pr-border)',
+            borderRadius: '12px',
+            padding: '20px 24px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <span className={`pr-cat-badge ${data.badgeClass}`}>{data.badgeLabel}</span>
+                <h1 style={{
+                  fontSize: '1.3rem',
+                  fontWeight: 700,
+                  color: 'var(--pr-text-pri)',
+                  letterSpacing: '-.02em',
+                  margin: 0,
+                }}>
+                  {data.name}
+                </h1>
+              </div>
+              <p style={{ fontSize: '.82rem', color: 'var(--pr-text-sec)', margin: 0 }}>
+                {data.description}
+              </p>
+              <p style={{ fontSize: '.75rem', color: 'var(--pr-text-ter)', marginTop: '6px' }}>
+                <strong style={{ color: 'var(--pr-text-sec)' }}>{data.services.length}件</strong>のサービス・
+                <strong style={{ color: 'var(--pr-text-sec)' }}>{data.reviewTotal}件</strong>のレビュー収録
+              </p>
+            </div>
+            <Link href="/review/new" className="pr-btn-primary" style={{ flexShrink: 0 }}>
+              レビューを投稿
+            </Link>
+          </div>
+
+          {/* ランキングセクション */}
+          {data.services.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '60px 20px',
+              color: 'var(--pr-text-ter)',
+              background: 'var(--pr-surface)',
+              border: '1px solid var(--pr-border)',
+              borderRadius: '12px',
+            }}>
+              <p style={{ fontSize: '1rem', marginBottom: '8px' }}>まだサービスが登録されていません</p>
+              <p style={{ fontSize: '.82rem' }}>近日公開予定です</p>
+            </div>
+          ) : (
+            <section className="pr-category-section">
+              <div className="pr-list-col-header">
+                <span className="pr-col-label">#</span>
+                <span className="pr-col-label">サービス名</span>
+                <span className="pr-col-label">スコア</span>
+                <span className="pr-col-label right">レビュー数</span>
+                <span className="pr-col-label"></span>
+              </div>
+
+              <ul className="pr-rank-list">
+                {data.services.map((service, i) => {
+                  const rank = i + 1;
+                  let rankClass = 'pr-rank-num';
+                  if (rank === 1) rankClass += ' top1';
+                  else if (rank === 2) rankClass += ' top2';
+                  else if (rank === 3) rankClass += ' top3';
+                  const pct = Math.round((service.score / 5) * 100);
+
+                  return (
+                    <li key={service.slug}>
+                      <Link href={`/${category}/${service.slug}`} className="pr-rank-row">
+                        <span className={rankClass}>{rank}</span>
+                        <div className="pr-service-info">
+                          <span className={`pr-service-avatar ${service.avatarClass}`}>{service.abbr}</span>
+                          <div className="pr-service-text">
+                            <span className="pr-service-name">{service.name}</span>
+                            <span className="pr-service-desc">{service.description}</span>
+                          </div>
+                        </div>
+                        <div className="pr-score-area">
+                          <span className="pr-star-icon">★</span>
+                          <span className="pr-score-val">{service.score.toFixed(1)}</span>
+                          <div className="pr-score-bar-wrap">
+                            <div className="pr-score-bar-bg">
+                              <div className="pr-score-bar-fill" style={{ width: `${pct}%` }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="pr-review-num">{service.reviewCount.toLocaleString()}件</span>
+                        <span className="pr-row-arrow">›</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
+        </div>
+      </main>
+
+      {/* ===== フッター ===== */}
+      <footer className="pr-footer">
+        <div className="pr-container">
+          <div className="pr-footer-grid">
+            <div>
+              <Link href="/" className="pr-footer-logo">
+                <span className="pr-logo-icon">P</span>
+                Plainrank
+              </Link>
+              <p className="pr-footer-tagline">
+                広告なし・スポンサーなし・正直なレビューだけ。<br />
+                SaaS・AIツールの「本音」が集まる独立評価サイトです。
+              </p>
+            </div>
+
+            <div>
+              <div className="pr-footer-col-title">サービス</div>
+              <ul className="pr-footer-links">
+                <li><Link href="/tools">ツール一覧</Link></li>
+                <li><Link href="/categories">カテゴリ</Link></li>
+                <li><Link href="/compare">ツール比較</Link></li>
+                <li><Link href="/ranking">総合ランキング</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <div className="pr-footer-col-title">ポリシー</div>
+              <ul className="pr-footer-links">
+                <li><Link href="/transparency">透明性ポリシー</Link></li>
+                <li><Link href="/guidelines">レビューガイドライン</Link></li>
+                <li><Link href="/privacy">プライバシーポリシー</Link></li>
+                <li><Link href="/terms">利用規約</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <div className="pr-footer-col-title">コミュニティ</div>
+              <ul className="pr-footer-links">
+                <li><Link href="/review/new">レビューを投稿</Link></li>
+                <li><Link href="/about">運営チーム</Link></li>
+                <li><Link href="/contact">お問い合わせ</Link></li>
+                <li><Link href="/rss">RSS フィード</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pr-footer-bottom">
+            <span className="pr-footer-copy">© 2026 Plainrank — 広告収入ゼロの独立メディア</span>
+            <span className="pr-footer-trust">✓ スポンサーシップなし · ✓ 独立運営</span>
+          </div>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }
