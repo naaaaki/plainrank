@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
+import { CategoryViewTracker } from '@/components/CategoryViewTracker';
 
 interface Props {
   params: Promise<{ category: string }>;
@@ -45,6 +46,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className="pr-page">
+      <CategoryViewTracker slug={category} />
       {/* ===== ヘッダー ===== */}
       <header className="pr-header">
         <div className="pr-container">

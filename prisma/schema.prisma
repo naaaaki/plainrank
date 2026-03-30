@@ -81,6 +81,7 @@ model Category {
   name        String   @unique
   slug        String   @unique
   description String?
+  viewCount   Int      @default(0)
   createdAt   DateTime @default(now())
 
   services Service[]

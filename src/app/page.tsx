@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { getServiceAbbr, getServiceAvatarClass } from '@/lib/service-meta';
+import { getServiceAbbr, getServiceAvatarClass, CATEGORY_DISPLAY } from '@/lib/service-meta';
 
 const TRENDING = [
   { abbr: 'GM', name: 'Gemini Advanced',  change: '+48% レビュー増', avatarClass: 'av-gemini' },
@@ -119,6 +119,7 @@ export default async function HomePage() {
     devToolsCount,
     designToolsCount,
     marketingToolsCount,
+    popularCategories,
   ] = await Promise.all([
     prisma.service.findMany({ where: { category: { slug: 'ai-tools' } },      orderBy: { score: 'desc' }, take: 3 }),
     prisma.service.findMany({ where: { category: { slug: 'dev-tools' } },     orderBy: { score: 'desc' }, take: 3 }),
@@ -132,6 +133,10 @@ export default async function HomePage() {
     prisma.service.count({ where: { category: { slug: 'dev-tools' } } }),
     prisma.service.count({ where: { category: { slug: 'design-tools' } } }),
     prisma.service.count({ where: { category: { slug: 'marketing' } } }),
+    prisma.category.findMany({
+      orderBy: { viewCount: 'desc' },
+      include: { _count: { select: { services: true } } },
+    }),
   ]);
 
   function toRankItems(services: typeof aiToolsRaw): RankItem[] {
@@ -369,40 +374,20 @@ export default async function HomePage() {
             {/* ===== サイドバー ===== */}
             <aside className="pr-sidebar">
 
-              {/* カテゴリ一覧グリッド */}
+              {/* 人気カテゴリグリッド */}
               <div className="pr-sidebar-card">
-                <div className="pr-sidebar-card-head">カテゴリ一覧</div>
+                <div className="pr-sidebar-card-head">人気カテゴリ</div>
                 <div className="pr-cat-grid">
-                  <Link href="/ai-tools" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">✦</span>
-                    <span className="pr-cat-grid-name">AIツール</span>
-                    <span className="pr-cat-grid-count">{aiToolsCount}サービス</span>
-                  </Link>
-                  <Link href="/dev-tools" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">⚙</span>
-                    <span className="pr-cat-grid-name">開発ツール</span>
-                    <span className="pr-cat-grid-count">{devToolsCount}サービス</span>
-                  </Link>
-                  <Link href="/design-tools" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">◈</span>
-                    <span className="pr-cat-grid-name">デザイン</span>
-                    <span className="pr-cat-grid-count">{designToolsCount}サービス</span>
-                  </Link>
-                  <Link href="/marketing" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">◎</span>
-                    <span className="pr-cat-grid-name">マーケSaaS</span>
-                    <span className="pr-cat-grid-count">{marketingToolsCount}サービス</span>
-                  </Link>
-                  <Link href="/productivity" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">▶</span>
-                    <span className="pr-cat-grid-name">生産性</span>
-                    <span className="pr-cat-grid-count">0サービス</span>
-                  </Link>
-                  <Link href="/security" className="pr-cat-grid-item">
-                    <span className="pr-cat-grid-icon">◉</span>
-                    <span className="pr-cat-grid-name">セキュリティ</span>
-                    <span className="pr-cat-grid-count">0サービス</span>
-                  </Link>
+                  {popularCategories.map((cat) => {
+                    const display = CATEGORY_DISPLAY[cat.slug] ?? { icon: '●', color: '#666' };
+                    return (
+                      <Link key={cat.slug} href={`/${cat.slug}`} className="pr-cat-grid-item">
+                        <span className="pr-cat-grid-icon">{display.icon}</span>
+                        <span className="pr-cat-grid-name">{cat.name}</span>
+                        <span className="pr-cat-grid-count">{cat._count.services}サービス</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
 

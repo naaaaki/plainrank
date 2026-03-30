@@ -22,6 +22,15 @@ export function getServiceAvatarClass(slug: string): string {
   return `av-${slug}`;
 }
 
+export const CATEGORY_DISPLAY: Record<string, { icon: string; color: string }> = {
+  'ai-tools':     { icon: '✦', color: '#2563EB' },
+  'dev-tools':    { icon: '⚙', color: '#16a34a' },
+  'design-tools': { icon: '◈', color: '#7c3aed' },
+  'marketing':    { icon: '◎', color: '#b45309' },
+  'productivity': { icon: '▶', color: '#dc2626' },
+  'security':     { icon: '◉', color: '#059669' },
+};
+
 export const CATEGORY_META: Record<
   string,
   { name: string; description: string; badgeClass: string; badgeLabel: string }
