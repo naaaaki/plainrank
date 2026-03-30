@@ -1,10 +1,38 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
 
 interface Props {
   params: Promise<{ category: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category, slug } = await params;
+
+  const service = await prisma.service.findFirst({
+    where: { slug, category: { slug: category } },
+    include: { category: true },
+  });
+  if (!service) {
+    return { title: 'サービス詳細 | Plainrank' };
+  }
+
+  const title = `${service.name} レビュー・評価 | Plainrank`;
+  const description = service.description
+    ? service.description
+    : `${service.name}のユーザーレビュー・評価を掲載。広告なし・正直な口コミで比較できます。`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+  };
 }
 
 function ScoreBar({ label, score }: { label: string; score: number }) {
@@ -173,7 +201,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </p>
                 {service.website && (
                   <a
-                    href={service.website}
+                    href={`${service.website}?utm_source=plainrank&utm_medium=referral&utm_campaign=service_detail`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -204,23 +232,36 @@ export default async function ServiceDetailPage({ params }: Props) {
                 minWidth: '140px',
                 flexShrink: 0,
               }}>
-                <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--pr-text-pri)', letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                  {service.score.toFixed(1)}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <svg key={i} width="14" height="14" viewBox="0 0 20 20" fill={i <= Math.round(service.score) ? '#d97706' : 'var(--pr-surface-3)'}>
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <div style={{ fontSize: '.72rem', color: 'var(--pr-text-ter)', marginBottom: '12px' }}>
-                  {service.reviewCount.toLocaleString()} 件のレビュー
-                </div>
-                {/* スコアバー */}
-                <div style={{ width: '100%', height: '4px', background: 'var(--pr-surface-3)', borderRadius: '2px', overflow: 'hidden', marginBottom: '12px' }}>
-                  <div style={{ width: `${scorePct}%`, height: '100%', background: 'linear-gradient(90deg, #d97706, #f59e0b)', borderRadius: '2px' }} />
-                </div>
+                {service.reviewCount > 0 ? (
+                  <>
+                    <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--pr-text-pri)', letterSpacing: '-.03em', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                      {service.score.toFixed(1)}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0 4px' }}>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <svg key={i} width="14" height="14" viewBox="0 0 20 20" fill={i <= Math.round(service.score) ? '#d97706' : 'var(--pr-surface-3)'}>
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: '.72rem', color: 'var(--pr-text-ter)', marginBottom: '12px' }}>
+                      {service.reviewCount.toLocaleString()} 件のレビュー
+                    </div>
+                    {/* スコアバー */}
+                    <div style={{ width: '100%', height: '4px', background: 'var(--pr-surface-3)', borderRadius: '2px', overflow: 'hidden', marginBottom: '12px' }}>
+                      <div style={{ width: `${scorePct}%`, height: '100%', background: 'linear-gradient(90deg, #d97706, #f59e0b)', borderRadius: '2px' }} />
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--pr-text-ter)', marginBottom: '6px' }}>
+                      レビュー募集中
+                    </div>
+                    <div style={{ fontSize: '.72rem', color: 'var(--pr-text-ter)' }}>
+                      まだレビューがありません
+                    </div>
+                  </div>
+                )}
                 <Link href="/reviews/new" className="pr-btn-cta-full">
                   レビューを書く
                 </Link>
@@ -293,8 +334,10 @@ export default async function ServiceDetailPage({ params }: Props) {
                 textAlign: 'center',
                 color: 'var(--pr-text-ter)',
               }}>
-                <p style={{ fontSize: '.9rem', marginBottom: '8px' }}>まだレビューがありません</p>
-                <p style={{ fontSize: '.82rem' }}>最初のレビューを投稿してみませんか？</p>
+                <p style={{ fontSize: '.9rem', marginBottom: '8px' }}>まだレビューがありません。最初のレビューを書いてみませんか？</p>
+                <Link href="/reviews/new" className="pr-btn-primary" style={{ display: 'inline-block', marginTop: '12px', fontSize: '.82rem' }}>
+                  レビューを書く
+                </Link>
               </div>
             ) : (
               <div style={{ background: 'var(--pr-surface)', border: '1px solid var(--pr-border)', borderRadius: '12px', overflow: 'hidden' }}>

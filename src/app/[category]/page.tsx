@@ -1,11 +1,42 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
 import { CategoryViewTracker } from '@/components/CategoryViewTracker';
 
 interface Props {
   params: Promise<{ category: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { category } = await params;
+
+  const categoryData = await prisma.category.findUnique({
+    where: { slug: category },
+  });
+  if (!categoryData) {
+    return { title: 'カテゴリ | Plainrank' };
+  }
+
+  const meta = CATEGORY_META[category] ?? {
+    name: categoryData.name,
+    description: categoryData.description ?? '',
+  };
+
+  const title = `${meta.name} おすすめ比較ランキング | Plainrank`;
+  const description = meta.description
+    ? `${meta.description} — 広告なし・正直なユーザーレビューで${meta.name}を比較。`
+    : `${meta.name}のおすすめサービスを広告なし・正直なユーザーレビューで比較ランキング。`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+  };
 }
 
 function StarRating({ score }: { score: number }) {
@@ -65,7 +96,7 @@ export default async function CategoryPage({ params }: Props) {
             <nav className="pr-header-nav">
               <Link href="/ranking" className="pr-btn-ghost">ランキング</Link>
               <Link href="/compare" className="pr-btn-ghost">比較する</Link>
-              <Link href="/review/new" className="pr-btn-ghost">レビューを書く</Link>
+              <Link href="/reviews/new" className="pr-btn-ghost">レビューを書く</Link>
               <Link href="/auth/signin" className="pr-btn-primary">ログイン</Link>
             </nav>
           </div>
@@ -154,7 +185,7 @@ export default async function CategoryPage({ params }: Props) {
                 <strong style={{ color: 'var(--pr-text-sec)' }}>{reviewTotal.toLocaleString()}件</strong>のレビュー収録
               </p>
             </div>
-            <Link href="/review/new" className="pr-btn-primary" style={{ flexShrink: 0 }}>
+            <Link href="/reviews/new" className="pr-btn-primary" style={{ flexShrink: 0 }}>
               レビューを投稿
             </Link>
           </div>
@@ -193,6 +224,8 @@ export default async function CategoryPage({ params }: Props) {
                   const abbr = getServiceAbbr(service.slug, service.name);
                   const avatarClass = getServiceAvatarClass(service.slug);
 
+                  const hasReviews = service.reviewCount > 0;
+
                   return (
                     <li key={service.slug}>
                       <Link href={`/${category}/${service.slug}`} className="pr-rank-row">
@@ -204,15 +237,21 @@ export default async function CategoryPage({ params }: Props) {
                             <span className="pr-service-desc">{service.description ?? ''}</span>
                           </div>
                         </div>
-                        <div className="pr-score-area">
-                          <span className="pr-star-icon">★</span>
-                          <span className="pr-score-val">{service.score.toFixed(1)}</span>
-                          <div className="pr-score-bar-wrap">
-                            <div className="pr-score-bar-bg">
-                              <div className="pr-score-bar-fill" style={{ width: `${pct}%` }}></div>
+                        {hasReviews ? (
+                          <div className="pr-score-area">
+                            <span className="pr-star-icon">★</span>
+                            <span className="pr-score-val">{service.score.toFixed(1)}</span>
+                            <div className="pr-score-bar-wrap">
+                              <div className="pr-score-bar-bg">
+                                <div className="pr-score-bar-fill" style={{ width: `${pct}%` }}></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="pr-score-area">
+                            <span style={{ fontSize: '.72rem', color: 'var(--pr-text-ter)', fontStyle: 'italic' }}>レビュー募集中</span>
+                          </div>
+                        )}
                         <span className="pr-review-num">{service.reviewCount.toLocaleString()}件</span>
                         <span className="pr-row-arrow">›</span>
                       </Link>
@@ -264,7 +303,7 @@ export default async function CategoryPage({ params }: Props) {
             <div>
               <div className="pr-footer-col-title">コミュニティ</div>
               <ul className="pr-footer-links">
-                <li><Link href="/review/new">レビューを投稿</Link></li>
+                <li><Link href="/reviews/new">レビューを投稿</Link></li>
                 <li><Link href="/about">運営チーム</Link></li>
                 <li><Link href="/contact">お問い合わせ</Link></li>
                 <li><Link href="/rss">RSS フィード</Link></li>
