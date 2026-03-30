@@ -1181,3 +1181,20 @@
   transition: color .15s;
 }
 .pr-breadcrumb-link:hover { color: var(--pr-accent); }
+
+/* レビューフォーム 良い点・改善点グリッド */
+.pr-review-grid {
+  background: var(--pr-surface);
+  border: 1px solid var(--pr-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .pr-review-grid {
+    grid-template-columns: 1fr;
+  }
+}

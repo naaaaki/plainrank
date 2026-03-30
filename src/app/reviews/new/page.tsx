@@ -121,7 +121,7 @@ export default function NewReviewPage() {
 
             <div className="pr-header-search">
               <span className="pr-search-icon">🔍</span>
-              <input type="text" placeholder="ツール・SaaS・AIを検索..." />
+              <input type="text" placeholder="検索（近日公開）" disabled />
               <span className="pr-search-kbd">/</span>
             </div>
 
@@ -262,15 +262,7 @@ export default function NewReviewPage() {
             </div>
 
             {/* 良い点・悪い点 */}
-            <div style={{
-              background: 'var(--pr-surface)',
-              border: '1px solid var(--pr-border)',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
-            }}>
+            <div className="pr-review-grid">
               <div>
                 <label style={labelStyle}>良い点（任意）</label>
                 <textarea
