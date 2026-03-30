@@ -1198,3 +1198,76 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== 検索ドロップダウン ===== */
+.pr-search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--pr-surface);
+  border: 1px solid var(--pr-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.pr-search-dropdown-empty {
+  padding: 14px 16px;
+  font-size: .82rem;
+  color: var(--pr-text-ter);
+  text-align: center;
+}
+
+.pr-search-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--pr-border);
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s;
+}
+
+.pr-search-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.pr-search-dropdown-item:hover {
+  background: var(--pr-surface-2);
+}
+
+.pr-search-dropdown-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pr-search-dropdown-item-name {
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--pr-text-pri);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pr-search-dropdown-item-category {
+  font-size: .72rem;
+  color: var(--pr-text-ter);
+}
+
+.pr-search-dropdown-item-score {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--pr-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

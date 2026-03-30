@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_DISPLAY } from '@/lib/service-meta';
+import SearchBar from '@/components/layout/SearchBar';
 
 const TRENDING = [
   { abbr: 'GM', name: 'Gemini Advanced',  change: '+48% レビュー増', avatarClass: 'av-gemini' },
@@ -174,11 +175,7 @@ export default async function HomePage() {
               Plainrank
             </Link>
 
-            <div className="pr-header-search">
-              <span className="pr-search-icon">🔍</span>
-              <input type="text" placeholder="ツール・SaaS・AIを検索..." />
-              <span className="pr-search-kbd">/</span>
-            </div>
+            <SearchBar />
 
             <nav className="pr-header-nav">
               <Link href="/ranking" className="pr-btn-ghost">ランキング</Link>
