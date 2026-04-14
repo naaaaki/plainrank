@@ -6,7 +6,6 @@ import { useState } from "react";
 export default function RequestCategoryPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -56,7 +55,6 @@ export default function RequestCategoryPage() {
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim() || undefined,
-          email: email.trim() || undefined,
         }),
       });
 
@@ -149,20 +147,6 @@ export default function RequestCategoryPage() {
               onChange={(e) => setDescription(e.target.value)}
               style={{ ...inputStyle, resize: "none" }}
               maxLength={500}
-            />
-          </div>
-
-          <div style={sectionStyle}>
-            <label style={labelStyle} htmlFor="cat-email">
-              返信用メールアドレス（任意）
-            </label>
-            <input
-              id="cat-email"
-              type="email"
-              placeholder="追加した際にご連絡します"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={inputStyle}
             />
           </div>
 
