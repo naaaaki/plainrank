@@ -155,6 +155,18 @@ model NewsletterSubscription {
   createdAt DateTime @default(now())
 }
 
+/// カテゴリ追加申請
+model CategoryRequest {
+  id          String   @id @default(cuid())
+  /// 希望カテゴリ名
+  name        String
+  /// 申請理由・説明
+  description String?  @db.Text
+  /// 返信用メールアドレス（任意）
+  email       String?
+  createdAt   DateTime @default(now())
+}
+
 /// 不正・スパムレビューへの通報
 model Flag {
   id        String   @id @default(cuid())
