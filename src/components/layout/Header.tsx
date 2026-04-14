@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 export default async function Header() {
   const session = await auth();
   const isLoggedIn = !!session?.user?.id;
+  const isAdmin = isLoggedIn && session.user?.email === process.env.ADMIN_EMAIL;
 
   return (
     <header className="pr-header">
@@ -16,7 +17,7 @@ export default async function Header() {
             Plainrank
           </Link>
           <SearchBar />
-          <NavLinks isLoggedIn={isLoggedIn} />
+          <NavLinks isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
         </div>
       </div>
     </header>

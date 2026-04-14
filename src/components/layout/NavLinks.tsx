@@ -7,9 +7,11 @@ import { useState } from 'react';
 interface NavLinksProps {
   /** ログイン済みユーザーかどうか（サーバーコンポーネントから渡される） */
   isLoggedIn: boolean;
+  /** 管理者かどうか（サーバーコンポーネントから渡される） */
+  isAdmin: boolean;
 }
 
-export default function NavLinks({ isLoggedIn }: NavLinksProps) {
+export default function NavLinks({ isLoggedIn, isAdmin }: NavLinksProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -63,11 +65,12 @@ export default function NavLinks({ isLoggedIn }: NavLinksProps) {
         <Link href="/reviews/new" className="pr-btn-outline" onClick={() => setOpen(false)}>
           レビューを書く
         </Link>
-        {isLoggedIn ? (
+        {isAdmin && (
           <Link href="/admin" className="pr-btn-primary" onClick={() => setOpen(false)}>
             管理
           </Link>
-        ) : (
+        )}
+        {!isLoggedIn && (
           <Link href="/auth/signin" className="pr-btn-primary" onClick={() => setOpen(false)}>
             ログイン
           </Link>
