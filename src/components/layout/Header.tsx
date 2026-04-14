@@ -1,12 +1,16 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import SearchBar from './SearchBar';
-import NavLinks from './NavLinks';
-import { auth } from '@/auth';
+import NavLinksServer from './NavLinksServer';
+import NavLinksFallback from './NavLinksFallback';
 
-export default async function Header() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user?.id;
-
+/**
+ * サイト共通ヘッダー。
+ *
+ * auth() は NavLinksServer 内で呼び出し、Suspense で包むことでページ描画をブロックしない。
+ * ロゴ・検索バーはすぐに表示され、ナビゲーションは認証解決後に差し込まれる。
+ */
+export default function Header() {
   return (
     <header className="pr-header">
       <div className="pr-container">
@@ -16,7 +20,9 @@ export default async function Header() {
             Plainrank
           </Link>
           <SearchBar />
-          <NavLinks isLoggedIn={isLoggedIn} />
+          <Suspense fallback={<NavLinksFallback />}>
+            <NavLinksServer />
+          </Suspense>
         </div>
       </div>
     </header>
