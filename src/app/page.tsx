@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_DISPLAY } from '@/lib/service-meta';
 import CategoryNav from '@/components/CategoryNav';
-import NewsletterForm from '@/components/newsletter/NewsletterForm';
 
 export const revalidate = 60;
 
@@ -416,9 +415,6 @@ export default async function HomePage() {
           </div>
         </div>
       </main>
-
-      {/* ===== ニュースレター登録（フッター上） ===== */}
-      <NewsletterForm />
 
       {/* ===== フッター ===== */}
       <footer className="pr-footer">

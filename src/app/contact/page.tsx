@@ -53,7 +53,7 @@ export default function ContactPage() {
               メールアドレス
             </div>
             <a
-              href="mailto:contact@plainrank.io"
+              href="mailto:dino.spike.web3@gmail.com"
               style={{
                 fontSize: '1.15rem',
                 fontWeight: 700,
@@ -62,7 +62,7 @@ export default function ContactPage() {
                 letterSpacing: '-.01em',
               }}
             >
-              contact@plainrank.io
+              dino.spike.web3@gmail.com
             </a>
             <p style={{ fontSize: '.85rem', color: 'var(--pr-text-ter)', lineHeight: 1.7, margin: 0 }}>
               通常2〜3営業日以内にご返信します。
