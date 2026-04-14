@@ -282,8 +282,8 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
           <li>登録するとすぐに公開されます</li>
           <li>スパム・宣伝目的・実在しないサービスの登録は禁止です</li>
           <li>すでに掲載済みのサービスの重複登録はご遠慮ください</li>
-          <li>不適切なコンテンツが含まれる場合、予告なく削除することがあります</li>
           <li>サービス情報は正確な内容を入力してください</li>
+          <li>定期的に掲載内容を確認しており、不適切と判断したものは予告なく削除することがあります</li>
         </ul>
       </div>
 
