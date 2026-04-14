@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
 import Header from "@/components/layout/Header";
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body style={{ margin: 0, padding: 0 }}>
+        <Providers>
           <NavigationProgress />
           <Header />
           {children}
-        </body>
+        </Providers>
+      </body>
     </html>
   );
 }

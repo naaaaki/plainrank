@@ -1,14 +1,11 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
 import SearchBar from './SearchBar';
-import NavLinksServer from './NavLinksServer';
-import NavLinksFallback from './NavLinksFallback';
+import NavLinks from './NavLinks';
 
 /**
  * サイト共通ヘッダー。
- *
- * auth() は NavLinksServer 内で呼び出し、Suspense で包むことでページ描画をブロックしない。
- * ロゴ・検索バーはすぐに表示され、ナビゲーションは認証解決後に差し込まれる。
+ * セッション確認は NavLinks 内で useSession()（クライアントサイド）で行う。
+ * auth() を呼ばないためページが静的配信（CDN）される。
  */
 export default function Header() {
   return (
@@ -20,9 +17,7 @@ export default function Header() {
             Plainrank
           </Link>
           <SearchBar />
-          <Suspense fallback={<NavLinksFallback />}>
-            <NavLinksServer />
-          </Suspense>
+          <NavLinks />
         </div>
       </div>
     </header>

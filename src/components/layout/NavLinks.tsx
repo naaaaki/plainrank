@@ -2,15 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
-interface NavLinksProps {
-  /** ログイン済みユーザーかどうか（サーバーコンポーネントから渡される） */
-  isLoggedIn: boolean;
-}
-
-export default function NavLinks({ isLoggedIn }: NavLinksProps) {
+export default function NavLinks() {
   const pathname = usePathname();
+  const { status } = useSession();
+  const isLoggedIn = status === 'authenticated';
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) =>
@@ -63,7 +61,7 @@ export default function NavLinks({ isLoggedIn }: NavLinksProps) {
         <Link href="/reviews/new" className="pr-btn-outline" onClick={() => setOpen(false)}>
           レビューを書く
         </Link>
-        {!isLoggedIn && (
+        {!isLoggedIn && status !== 'loading' && (
           <Link href="/auth/signin" className="pr-btn-primary" onClick={() => setOpen(false)}>
             ログイン
           </Link>
