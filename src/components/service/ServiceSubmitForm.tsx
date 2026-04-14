@@ -235,6 +235,16 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
             </option>
           ))}
         </select>
+        <p style={{ fontSize: ".75rem", color: "var(--pr-text-ter)", marginTop: "8px" }}>
+          適したカテゴリがない場合は
+          <a
+            href="mailto:dino.spike.web3@gmail.com?subject=カテゴリ追加の申請&body=追加を希望するカテゴリ名：%0A理由・説明："
+            style={{ color: "var(--pr-accent)", textDecoration: "none", margin: "0 2px" }}
+          >
+            こちらから申請
+          </a>
+          してください。
+        </p>
       </div>
 
       {/* 説明 */}
