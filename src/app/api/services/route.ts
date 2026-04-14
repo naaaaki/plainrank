@@ -91,7 +91,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     slug = `${baseSlug}-${Math.random().toString(36).slice(2, 7)}`;
   }
 
-  // 6. サービス作成（status=PENDING）
+  // 6. サービス作成（status=APPROVED：投稿即公開）
   const service = await prisma.service.create({
     data: {
       name,
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       description: description || null,
       categoryId,
       submittedById: userId,
-      status: "PENDING",
+      status: "APPROVED",
     },
     select: {
       id: true,

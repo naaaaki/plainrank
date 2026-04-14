@@ -149,29 +149,18 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
             letterSpacing: "-.02em",
           }}
         >
-          登録申請を受け付けました
+          登録しました
         </h2>
         <p
           style={{
             fontSize: ".875rem",
             color: "var(--pr-text-sec)",
-            marginBottom: "8px",
+            marginBottom: "28px",
             lineHeight: 1.65,
             maxWidth: "360px",
           }}
         >
-          審査中です。承認されると公開されます。
-        </p>
-        <p
-          style={{
-            fontSize: ".8rem",
-            color: "var(--pr-text-ter)",
-            marginBottom: "28px",
-            lineHeight: 1.6,
-            maxWidth: "360px",
-          }}
-        >
-          通常数営業日以内に審査します。スパムや重複投稿は却下される場合があります。
+          サービスが公開されました。早速レビューを書いてみましょう。
         </p>
         <Link href="/" className="pr-btn-primary" style={{ padding: "8px 24px" }}>
           トップに戻る
@@ -286,9 +275,7 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
           lineHeight: 1.6,
         }}
       >
-        <strong style={{ color: "var(--pr-text-pri)" }}>審査について：</strong>
-        スパム・重複・実在しないサービスの投稿は却下されます。
-        承認後はPlainrankに公開され、ユーザーがレビューを投稿できるようになります。
+        登録するとすぐに公開されます。スパム・重複・実在しないサービスの投稿はご遠慮ください。
       </div>
 
       {/* エラーメッセージ */}
@@ -323,7 +310,7 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
           cursor: isSubmitting ? "not-allowed" : "pointer",
         }}
       >
-        {isSubmitting ? "送信中..." : "登録申請を送信する"}
+        {isSubmitting ? "登録中..." : "サービスを登録する"}
       </button>
 
       <p
