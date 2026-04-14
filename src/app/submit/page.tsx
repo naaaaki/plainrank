@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import Header from "@/components/layout/Header";
 import ServiceSubmitForm from "@/components/service/ServiceSubmitForm";
 
 export const metadata: Metadata = {
@@ -30,7 +29,6 @@ export default async function SubmitPage() {
 
   return (
     <div className="pr-page">
-      <Header />
       <main style={{ background: "var(--pr-bg)", minHeight: "100vh" }}>
         <div
           className="pr-container"

@@ -3,8 +3,6 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
-import Header from '@/components/layout/Header';
-
 export const revalidate = 300;
 
 interface Props {
@@ -153,8 +151,6 @@ export default async function ServiceDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="pr-page">
-        <Header />
-
         {/* ===== メインコンテンツ ===== */}
         <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
           <div className="pr-container" style={{ paddingTop: '20px', paddingBottom: '60px' }}>

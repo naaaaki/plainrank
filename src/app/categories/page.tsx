@@ -2,8 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { CATEGORY_DISPLAY, CATEGORY_META } from '@/lib/service-meta';
-import Header from '@/components/layout/Header';
-
 export const revalidate = 60;
 
 // P3-39: カテゴリ一覧ページ canonical タグ
@@ -62,9 +60,6 @@ export default async function CategoriesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
     <div className="pr-page">
-      {/* ===== ヘッダー ===== */}
-      <Header />
-
       {/* ===== カテゴリクイックナビ ===== */}
       <nav className="pr-cat-nav">
         <div className="pr-container">

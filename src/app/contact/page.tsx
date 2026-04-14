@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-
 export const metadata: Metadata = {
   title: 'お問い合わせ | Plainrank',
   description: 'Plainrankへのお問い合わせページです。ご質問・ご意見はメールにてご連絡ください。',
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '40px', paddingBottom: '80px', maxWidth: '640px' }}>
 

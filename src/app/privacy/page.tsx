@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-
 export const metadata: Metadata = {
   title: 'プライバシーポリシー | Plainrank',
   description: 'Plainrankのプライバシーポリシーです。収集する情報・利用目的・Cookieの取り扱いについて説明します。',
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '40px', paddingBottom: '80px', maxWidth: '760px' }}>
 

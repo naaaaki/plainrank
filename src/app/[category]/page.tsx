@@ -4,8 +4,6 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
 import { CategoryViewTracker } from '@/components/CategoryViewTracker';
-import Header from '@/components/layout/Header';
-
 export const revalidate = 60;
 
 interface Props {
@@ -123,9 +121,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       />
       <div className="pr-page">
         <CategoryViewTracker slug={category} />
-        {/* ===== ヘッダー ===== */}
-        <Header />
-
         {/* ===== カテゴリクイックナビ ===== */}
         <nav className="pr-cat-nav">
           <div className="pr-container">

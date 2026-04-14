@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-
 export const metadata: Metadata = {
   title: 'Plainrankについて | Plainrank',
   description: 'Plainrankはアフィリエイト・スポンサーなしの独立SaaS/AIツールレビューサイトです。スコア計算式をコードごと公開し、透明性を担保しています。',
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '40px', paddingBottom: '80px', maxWidth: '760px' }}>
 

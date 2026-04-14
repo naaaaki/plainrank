@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-
 export const metadata: Metadata = {
   title: 'レビューガイドライン | Plainrank',
   description: 'Plainrankのレビューガイドラインです。良いレビューの書き方・禁止事項・審査方針を説明します。',
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
 export default function GuidelinesPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '40px', paddingBottom: '80px', maxWidth: '760px' }}>
 

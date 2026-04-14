@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/Header";
 import Link from "next/link";
 import ReviewFormClient from "./ReviewFormClient";
 
@@ -11,8 +10,6 @@ export const metadata: Metadata = {
 export default function NewReviewPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: "var(--pr-bg)", minHeight: "100vh" }}>
         <div className="pr-container" style={{ paddingTop: "20px", paddingBottom: "60px", maxWidth: "640px" }}>
 

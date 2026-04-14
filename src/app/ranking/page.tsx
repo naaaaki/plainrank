@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META, CATEGORY_DISPLAY } from '@/lib/service-meta';
-import Header from '@/components/layout/Header';
-
 export const revalidate = 60;
 
 export const metadata = {
@@ -32,9 +30,6 @@ export default async function RankingPage() {
 
   return (
     <div className="pr-page">
-      {/* ===== ヘッダー ===== */}
-      <Header />
-
       {/* ===== カテゴリクイックナビ ===== */}
       <nav className="pr-cat-nav">
         <div className="pr-container">

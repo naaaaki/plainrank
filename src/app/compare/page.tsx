@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getServiceAbbr, getServiceAvatarClass, CATEGORY_META } from '@/lib/service-meta';
-import Header from '@/components/layout/Header';
 import CompareSelector from './CompareSelector';
 
 export const metadata = {
@@ -48,7 +47,6 @@ export default async function ComparePage({ searchParams }: Props) {
     if (!serviceA || !serviceB) {
       return (
         <div className="pr-page">
-          <Header />
           <CatNav />
           <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
             <div className="pr-container" style={{ paddingTop: '48px', textAlign: 'center' }}>
@@ -90,7 +88,6 @@ export default async function ComparePage({ searchParams }: Props) {
 
     return (
       <div className="pr-page">
-        <Header />
         <CatNav />
         <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
           <div className="pr-container" style={{ paddingTop: '24px', paddingBottom: '64px', maxWidth: '860px' }}>
@@ -449,7 +446,6 @@ export default async function ComparePage({ searchParams }: Props) {
 
   return (
     <div className="pr-page">
-      <Header />
       <CatNav />
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '24px', paddingBottom: '64px', maxWidth: '760px' }}>

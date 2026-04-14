@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-
 export const metadata: Metadata = {
   title: '透明性ポリシー | Plainrank',
   description: 'Plainrankのスコア計算方法・不正レビュー対策・オープンソースポリシーを公開しています。ベイズ平均補正の計算式もGitHubで確認できます。',
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
 export default function TransparencyPage() {
   return (
     <div className="pr-page">
-      <Header />
-
       <main style={{ background: 'var(--pr-bg)', minHeight: '100vh' }}>
         <div className="pr-container" style={{ paddingTop: '40px', paddingBottom: '80px', maxWidth: '760px' }}>
 
