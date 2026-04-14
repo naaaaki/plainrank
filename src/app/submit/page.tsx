@@ -8,7 +8,7 @@ import ServiceSubmitForm from "@/components/service/ServiceSubmitForm";
 export const metadata: Metadata = {
   title: "サービスを登録する | Plainrank",
   description:
-    "Plainrankに新しいSaaS・AIツールを登録する。登録したサービスは審査後に公開されます。",
+    "Plainrankに新しいSaaS・AIツールを登録する。登録するとすぐに公開されます。",
 };
 
 /**
@@ -68,8 +68,7 @@ export default async function SubmitPage() {
               サービスを登録する
             </h1>
             <p style={{ fontSize: ".875rem", color: "var(--pr-text-sec)", lineHeight: 1.6 }}>
-              まだPlainrankに掲載されていないサービスを登録できます。
-              登録後は審査が入り、承認されると公開されます。
+              まだPlainrankに掲載されていないサービスを登録できます。登録するとすぐに公開されます。
             </p>
           </div>
 

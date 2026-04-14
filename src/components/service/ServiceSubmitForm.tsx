@@ -266,16 +266,25 @@ export default function ServiceSubmitForm({ categories }: ServiceSubmitFormProps
       {/* 注意事項 */}
       <div
         style={{
-          padding: "12px 14px",
+          padding: "14px 16px",
           background: "rgba(67,97,238,.06)",
           border: "1px solid rgba(67,97,238,.2)",
           borderRadius: "8px",
           fontSize: ".8rem",
           color: "var(--pr-text-sec)",
-          lineHeight: 1.6,
+          lineHeight: 1.75,
         }}
       >
-        登録するとすぐに公開されます。スパム・重複・実在しないサービスの投稿はご遠慮ください。
+        <strong style={{ color: "var(--pr-text-pri)", display: "block", marginBottom: "6px" }}>
+          登録にあたっての注意事項
+        </strong>
+        <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
+          <li>登録するとすぐに公開されます</li>
+          <li>スパム・宣伝目的・実在しないサービスの登録は禁止です</li>
+          <li>すでに掲載済みのサービスの重複登録はご遠慮ください</li>
+          <li>不適切なコンテンツが含まれる場合、予告なく削除することがあります</li>
+          <li>サービス情報は正確な内容を入力してください</li>
+        </ul>
       </div>
 
       {/* エラーメッセージ */}
